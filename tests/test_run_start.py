@@ -42,12 +42,12 @@ def test__prints_success_if_starts_with_return_status_zero(mocker: MockerFixture
 
 
 def test__success_if_timeout():
-    run_command(cmd="python -c 'import time; time.sleep(2)'", timeout=1)
+    run_command(cmd="python -c \"import time; time.sleep(2)\"", timeout=1)
 
 
 def test__prints_success_if_timeout(mocker: MockerFixture):
     mock_print = mocker.patch("builtins.print")
 
-    run_command(cmd="python -c 'import time; time.sleep(2)'", timeout=1, print_on_success="Timeout works as expected")
+    run_command(cmd="python -c \"import time; time.sleep(2)\"", timeout=1, print_on_success="Timeout works as expected")
 
     mock_print.assert_called_once_with("Timeout works as expected")
