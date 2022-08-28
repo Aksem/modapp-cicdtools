@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  CI:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        os: [ubuntu-20.04, macos-11, windows-2019]
+        python-version: ["3.10"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry==1.2.0rc2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: |
+          poetry install --verbose
+        shell: bash
+
+      - name: Lint
+        run: |
+          bash ./lint.sh modapp_cicdtools
+        shell: bash
+
+      - name: Run unit tests
+        if: ${{ !cancelled() }}
+        run: |
+          poetry run python -m pytest tests/
+        shell: bash
+
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: |
+          poetry run python -m nuitka \
+            --standalone \
+            --follow-imports \
+            --assume-yes-for-downloads \
+            --plugin-enable="pylint-warnings" \
+            --warn-unusual-code \
+            --warn-implicit-exceptions \
+            --show-memory \
+            --show-modules \
+            modapp_cicdtools/cli.py
+        shell: bash
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cicdtools ${{ matrix.os }}
+          path: ${{ github.workspace }}/cli.dist
