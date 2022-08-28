@@ -61,7 +61,7 @@ jobs:
           poetry env use ${{ matrix.python-version }}
           poetry run python -m nuitka modapp_cicdtools/cli.py
 
-      uses: actions/upload-artifact@v3
-          with:
-              name: cicdtools ${{ matrix.os }}
-              path: ${{ github.workspace }}/cli.bin
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cicdtools ${{ matrix.os }}
+          path: ${{ github.workspace }}/cli.bin
