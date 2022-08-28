@@ -4,9 +4,9 @@ from typing import Optional
 
 import typer
 
-from .archive import archive_to_zip
-from .file_exists import file_exists as _file_exists
-from .test_run import test_run_command
+from modapp_cicdtools.archive import archive_to_zip
+from modapp_cicdtools.file_exists import file_exists as _file_exists
+from modapp_cicdtools.test_run import test_run_command
 
 app = typer.Typer()
 
@@ -59,3 +59,7 @@ def test_run(
         print_on_success=print_on_success,
         print_on_failure=print_on_failure,
     )
+
+
+if __name__ == "__main__":
+    app()
