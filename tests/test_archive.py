@@ -1,3 +1,4 @@
+import re
 import zipfile
 from pathlib import Path
 
@@ -12,7 +13,7 @@ def test__file_not_found_error_if_input_not_exists(tmp_path: Path):
     unexisting_input = tmp_path / 'unexisting_dir'
     output = tmp_path / 'result_archive.zip'
 
-    with pytest.raises(FileNotFoundError, match=f"File or directory '{unexisting_input}' doesn't exist"):
+    with pytest.raises(FileNotFoundError, match=re.escape(f"File or directory '{unexisting_input}' doesn't exist")):
         archive_to_zip(path=unexisting_input, output=output)
 
 
@@ -32,7 +33,7 @@ def test__file_not_found_error_if_output_dir_not_exists(tmp_path: Path):
     input_filepath.touch()
     output = tmp_path / 'unexisting_dir' / 'result_archive.zip'
 
-    with pytest.raises(FileNotFoundError, match=f"Output directory '{output.parent}' doesn't exist"):
+    with pytest.raises(FileNotFoundError, match=re.escape(f"Output directory '{output.parent}' doesn't exist")):
         archive_to_zip(path=input_filepath, output=output)
 
 

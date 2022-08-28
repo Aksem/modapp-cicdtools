@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -15,7 +16,7 @@ def invalid_program_path(tmp_path: Path):
 
 
 def test__command_execution_error_if_fails_on_start(invalid_program_path: Path):
-    with pytest.raises(CommandExecutionError, match=f'Command failed to start, exit code 1, output:   File "{invalid_program_path}", line 1'):
+    with pytest.raises(CommandExecutionError, match=re.escape(f'Command failed to start, exit code 1, output:   File "{invalid_program_path}", line 1')):
         run_command(cmd=f"python {str(invalid_program_path)}")
 
 

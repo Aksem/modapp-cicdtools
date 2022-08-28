@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -7,11 +8,13 @@ from modapp_cicdtools.file_exists import file_exists
 
 
 def test__file_not_found_error_if_file_not_exists():
+    unexisting_file = Path('/tmp/linux_build_result')
+
     with pytest.raises(
         FileNotFoundError,
-        match="File '/tmp/linux_build_result' doesn't exist",
+        match=re.escape(f"File '{unexisting_file}' doesn't exist"),
     ):
-        file_exists(filepath=Path('/tmp/linux_build_result'))
+        file_exists(filepath=unexisting_file)
 
 
 def test__prints_failure_if_file_not_found_error(mocker: MockerFixture):
