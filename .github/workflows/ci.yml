@@ -23,6 +23,8 @@ jobs:
             cachepath: /home/runner/.cache/pypoetry/
           - os: macos-11
             cachepath: /Users/runner/Library/Caches/pypoetry/
+          - os: windows-2019
+            cachepath: C:\Users\runner\AppData\Local\pypoetry\Cache
 
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +45,7 @@ jobs:
           python${{ matrix.python-version }} -m pip install --upgrade pip
           git clone --depth 1 --single-branch --branch 1.2.0rc2 https://github.com/python-poetry/poetry.git
           pushd poetry
-          python${{ matrix.python-version }} install-poetry.py --version 1.2.0a2
+          python${{ matrix.python-version }} install-poetry.py --version 1.2.0rc2
           popd
           rm -r poetry
           echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -57,13 +59,13 @@ jobs:
 
       - name: Lint
         run: |
-          bash ./lint.sh
+          bash ./lint.sh modapp_cicdtools
 
       - name: Run unit tests
         if: ${{ !cancelled() }}
         run: |
           poetry env use ${{ matrix.python-version }}
-          poetry run python3 -m pytest tests/
+          poetry run python -m pytest tests/
 
       - name: Build
         if: ${{ !cancelled() }}
