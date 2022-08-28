@@ -35,22 +35,35 @@ jobs:
         run: |
           poetry env use ${{ matrix.python-version }}
           poetry install --verbose
+        shell: bash
 
       - name: Lint
         run: |
           bash ./lint.sh modapp_cicdtools
+        shell: bash
 
       - name: Run unit tests
         if: ${{ !cancelled() }}
         run: |
           poetry env use ${{ matrix.python-version }}
           poetry run python -m pytest tests/
+        shell: bash
 
       - name: Build
         if: ${{ !cancelled() }}
         run: |
           poetry env use ${{ matrix.python-version }}
-          poetry run python -m nuitka modapp_cicdtools/cli.py
+          poetry run python -m nuitka \
+            --onefile \
+            --follow-imports \
+            --assume-yes-for-downloads \
+            --plugin-enable="pylint-warnings" \
+            --warn-unusual-code \
+            --warn-implicit-exceptions \
+            --show-memory \
+            --show-modules \
+            modapp_cicdtools/cli.py
+        shell: bash
 
       - uses: actions/upload-artifact@v3
         with:

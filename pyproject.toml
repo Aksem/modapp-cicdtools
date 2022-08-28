@@ -75,13 +75,3 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 module = ['command_runner']
 ignore_missing_imports = true
-
-[nuitka]
-onefile = true
-follow-imports = true
-assume-yes-for-downloads = true
-plugin-enable = "pylint-warnings"
-warn-unusual-code = true
-warn-implicit-exceptions = true
-show-memory = true
-show-modules = true
