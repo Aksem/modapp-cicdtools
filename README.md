@@ -1,16 +1,16 @@
 # Tools for CI/CD cross-platform configurations
 
-Set of tools for simplyfing CI/CD configuration for cross-platform builds.
+Set of tools for simplifying CI/CD configuration for cross-platform builds.
 
 - documented
 - tested
 - available as executable (see 'Releases' page)
 
-**Motivation:** TODO
+**Motivation:** configuration of some typical operations in CI/CD for cross-platform applications are not as easy as it could be. Some are equal on UNIX, like macOS and Linux. However, parameters can differ. For Windows separate script is often required for cmd or powershell. This project aims to provide cross-platform tools to simplify CI/CD configuration for such applications and minimize the need for platform-specific scripts.
 
 ## Installation
 
-... TODO
+... will be explained after the first releases when the first binaries will be available for download.
 
 ## Commands & Usage
 
@@ -39,7 +39,7 @@ Set of tools for simplyfing CI/CD configuration for cross-platform builds.
 
 - file-exists
 
-  Check whether file or directory exists.
+  Check whether a file or directory exists.
 
   Signature:
 
@@ -56,7 +56,7 @@ Set of tools for simplyfing CI/CD configuration for cross-platform builds.
 
 - test-run
 
-  Check whether command(e.g. application) starts without errors. If command doesn't fail in 'timeout' seconds(10 by default), its execution is interpreted as successful.
+  Check whether the command(e.g., application) starts without errors. If the command doesn't fail in 'timeout' seconds(10 by default), its execution is interpreted as successful.
 
   Signature:
 
@@ -71,13 +71,13 @@ Set of tools for simplyfing CI/CD configuration for cross-platform builds.
   cicdtools test-run --cwd="$PWD/output" "app.AppImage"
   ```
 
-All comands also support `--print-on-success="<message>"` and `--print-on-failure="<message>"` options that can be used to print messages on success or failure. This is helpful to pass operation error to CI/CD system.
+All commands also support `--print-on-success="<message>"` and `--print-on-failure="<message>"` options that can be used to print messages on success or failure. This helps pass operation status to CI/CD system.
 
 Also, `--help` option is available for each command to get its documentation.
 
 ## Development
 
-- After changing the code, run `lint.sh` to check that you changes conform project rules.
-  It will be also checked in the CI/CD, but local run will save your time.
+- After changing the code, run `lint.sh` to check that your changes conform project rules.
+  CI/CD will also check it, but the local run will save you time.
 
-- `ordered-set` dependency is not used explicitly, but is needed to speed up compilation with nuitka
+- `ordered-set` dependency is not used explicitly but is needed to speed up compilation with nuitka
