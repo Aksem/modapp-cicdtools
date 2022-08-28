@@ -22,6 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install poetry
+        run: pipx install poetry==1.2.0rc2
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -30,18 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          git clone --depth 1 --single-branch --branch 1.2.0rc2 https://github.com/python-poetry/poetry.git
-          pushd poetry
-          python install-poetry.py --version 1.2.0rc2
-          popd
-          rm -r poetry
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-          if [ "${{ runner.os }}" == "macOS" ]; then
-            # is needed for macos to make poetry available
-            export PATH="/Users/runner/.local/bin:$PATH"
-          fi
           poetry env use ${{ matrix.python-version }}
           poetry install --verbose
 
