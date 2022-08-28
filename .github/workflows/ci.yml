@@ -33,7 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry env use ${{ matrix.python-version }}
           poetry install --verbose
         shell: bash
 
@@ -45,16 +44,14 @@ jobs:
       - name: Run unit tests
         if: ${{ !cancelled() }}
         run: |
-          poetry env use ${{ matrix.python-version }}
           poetry run python -m pytest tests/
         shell: bash
 
       - name: Build
         if: ${{ !cancelled() }}
         run: |
-          poetry env use ${{ matrix.python-version }}
           poetry run python -m nuitka \
-            --onefile \
+            --standalone \
             --follow-imports \
             --assume-yes-for-downloads \
             --plugin-enable="pylint-warnings" \
@@ -68,4 +65,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: cicdtools ${{ matrix.os }}
-          path: ${{ github.workspace }}/cli.bin
+          path: ${{ github.workspace }}/cli.dist
