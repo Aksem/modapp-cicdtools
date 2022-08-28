@@ -18,34 +18,22 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-11, windows-2019]
         python-version: ["3.10"]
-        include:
-          - os: ubuntu-20.04
-            cachepath: /home/runner/.cache/pypoetry/
-          - os: macos-11
-            cachepath: /Users/runner/Library/Caches/pypoetry/
-          - os: windows-2019
-            cachepath: C:\Users\runner\AppData\Local\pypoetry\Cache
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Cache Python dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.cachepath }}
-          key: ${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
 
       - name: Install dependencies
         run: |
-          python${{ matrix.python-version }} -m pip install --upgrade pip
+          python -m pip install --upgrade pip
           git clone --depth 1 --single-branch --branch 1.2.0rc2 https://github.com/python-poetry/poetry.git
           pushd poetry
-          python${{ matrix.python-version }} install-poetry.py --version 1.2.0rc2
+          python install-poetry.py --version 1.2.0rc2
           popd
           rm -r poetry
           echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -73,4 +61,7 @@ jobs:
           poetry env use ${{ matrix.python-version }}
           poetry run python -m nuitka modapp_cicdtools/cli.py
 
-      # TODO: save artifacts
+      uses: actions/upload-artifact@v3
+          with:
+              name: cicdtools ${{ matrix.os }}
+              path: ${{ github.workspace }}/cli.bin

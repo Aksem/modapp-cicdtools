@@ -30,6 +30,7 @@ bandit = "^1.7.4"
 safety = "^2.1.1"
 mypy = "^0.971"
 Nuitka = "^1.0.6"
+ordered-set = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.1.0b2"]
@@ -77,3 +78,10 @@ ignore_missing_imports = true
 
 [nuitka]
 onefile = true
+follow-imports = true
+assume-yes-for-downloads = true
+plugin-enable = "pylint-warnings"
+warn-unusual-code = true
+warn-implicit-exceptions = true
+show-memory = true
+show-modules = true

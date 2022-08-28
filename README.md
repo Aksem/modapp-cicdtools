@@ -79,3 +79,5 @@ Also, `--help` option is available for each command to get its documentation.
 
 - After changing the code, run `lint.sh` to check that you changes conform project rules.
   It will be also checked in the CI/CD, but local run will save your time.
+
+- `ordered-set` dependency is not used explicitly, but is needed to speed up compilation with nuitka
