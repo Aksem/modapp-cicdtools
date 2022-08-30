@@ -78,7 +78,7 @@ jobs:
             --warn-implicit-exceptions \
             --show-memory \
             --show-modules \
-            $(nuitkaArgs) \
+            ${{ matrix.nuitkaArgs }} \
             modapp_cicdtools/cli.py
         shell: bash
 
