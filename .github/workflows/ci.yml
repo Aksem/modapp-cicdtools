@@ -29,6 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: msys
+        if: ${{ matrix.name == 'Windows' }}
+        uses: msys2/setup-msys2@v2
+
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
 
@@ -60,6 +64,7 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
+          export NUITKA_CACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --standalone \
             --follow-imports \
