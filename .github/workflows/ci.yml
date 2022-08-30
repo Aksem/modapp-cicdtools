@@ -2,8 +2,6 @@ name: CI
 
 on:
   push:
-    tags:
-      - "v*"
   pull_request:
     types: [opened, reopened]
 
@@ -12,7 +10,7 @@ defaults:
     shell: bash
 
 jobs:
-  CI:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,9 +18,26 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-11, windows-2019]
         python-version: ["3.10"]
+        include:
+          - os: ubuntu-20.04
+            name: Linux
+            nuitkaArgs: ""
+          - os: macos-11
+            name: macOS
+            nuitkaArgs: ""
+          - os: windows-2019
+            name: Windows
+            nuitkaArgs: "--mingw64"
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: msys
+        if: ${{ matrix.name == 'Windows' }}
+        uses: msys2/setup-msys2@v2
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
 
       - name: Install poetry
         run: pipx install poetry==1.2.0rc2
@@ -52,6 +67,8 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
+          echo $PWD/.ccache
+          export NUITKA_CACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --standalone \
             --follow-imports \
@@ -61,18 +78,33 @@ jobs:
             --warn-implicit-exceptions \
             --show-memory \
             --show-modules \
+            ${{ matrix.nuitkaArgs }} \
             modapp_cicdtools/cli.py
         shell: bash
 
       - uses: actions/upload-artifact@v3
         with:
-          name: cicdtools ${{ matrix.os }}
+          name: cicdtools_${{ matrix.name }}
           path: ${{ github.workspace }}/cli.dist
 
+  release:
+    needs: build
+    runs-on: ubuntu-20.04
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download binaries
+        uses: actions/download-artifact@v3
+
+      - name: Archive
+        run: |
+          chmod +x ./cicdtools_Linux/cli
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_Linux cicdtools_Linux.zip
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_macOS cicdtools_macOS.zip
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_Windows cicdtools_Windows.zip
+
       - uses: "marvinpinto/action-automatic-releases@latest"
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: |
-            ${{ github.workspace }}/cli.dist
+          files: "cicdtools_*.zip"
