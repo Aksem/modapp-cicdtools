@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+
       - name: Install poetry
         run: pipx install poetry==1.2.0rc2
 
@@ -77,12 +80,19 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-20.04
-    # if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
       - name: Download binaries
         uses: actions/download-artifact@v3
-  
+
+      - name: Archive
+        run: |
+          chmod +x ./cicdtools_Linux/cli
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_Linux cicdtools_Linux.zip
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_macOS cicdtools_macOS.zip
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_Windows cicdtools_Windows.zip
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
