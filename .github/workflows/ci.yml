@@ -21,10 +21,13 @@ jobs:
         include:
           - os: ubuntu-20.04
             name: Linux
+            nuitkaArgs: ""
           - os: macos-11
             name: macOS
+            nuitkaArgs: ""
           - os: windows-2019
             name: Windows
+            nuitkaArgs: "--mingw64"
 
     steps:
       - uses: actions/checkout@v3
@@ -64,6 +67,7 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
+          echo $PWD/.ccache
           export NUITKA_CACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --standalone \
@@ -74,6 +78,7 @@ jobs:
             --warn-implicit-exceptions \
             --show-memory \
             --show-modules \
+            $(nuitkaArgs) \
             modapp_cicdtools/cli.py
         shell: bash
 
