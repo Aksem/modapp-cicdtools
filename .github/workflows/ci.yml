@@ -38,6 +38,11 @@ jobs:
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
+      
+      - name: Cache Nuitka
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuitka_cache
 
       - name: Install poetry
         run: pipx install poetry==1.2.0rc2
@@ -67,6 +72,7 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
+          export NUITKA_CACHE_DIR=$PWD/.nuitka_cache
           export CCACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --follow-imports \
