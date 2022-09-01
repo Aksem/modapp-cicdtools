@@ -67,7 +67,7 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
-          export NUITKA_CACHE_DIR=$PWD/.ccache
+          export CCACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --follow-imports \
             --assume-yes-for-downloads \
@@ -78,8 +78,6 @@ jobs:
             --show-modules \
             ${{ matrix.nuitkaArgs }} \
             modapp_cicdtools/cli.py
-          
-          ls $PWD/.ccache
         shell: bash
 
       - uses: actions/upload-artifact@v3
