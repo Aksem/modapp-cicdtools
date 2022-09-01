@@ -21,13 +21,13 @@ jobs:
         include:
           - os: ubuntu-20.04
             name: Linux
-            nuitkaArgs: "--standalone"
+            nuitkaArgs: ""
           - os: macos-11
             name: macOS
-            nuitkaArgs: "--standalone"
+            nuitkaArgs: ""
           - os: windows-2019
             name: Windows
-            nuitkaArgs: "--mingw64 --onefile"
+            nuitkaArgs: "--mingw64"
 
     steps:
       - uses: actions/checkout@v3
@@ -76,6 +76,7 @@ jobs:
           export NUITKA_CACHE_DIR=$PWD/.nuitka_cache
           export CCACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
+            --standalone \
             --follow-imports \
             --assume-yes-for-downloads \
             --plugin-enable="pylint-warnings" \
@@ -107,8 +108,7 @@ jobs:
           chmod +x ./cicdtools_Linux/cli
           ./cicdtools_Linux/cli archive $PWD/cicdtools_Linux cicdtools_Linux.zip
           ./cicdtools_Linux/cli archive $PWD/cicdtools_macOS cicdtools_macOS.zip
-
-          mv $PWD/cicdtools_Windows/cli.exe cicdtools.exe
+          ./cicdtools_Linux/cli archive $PWD/cicdtools_Windows cicdtools_Windows.zip
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -116,4 +116,3 @@ jobs:
           prerelease: false
           files: |
             "cicdtools_*.zip"
-            "cicdtools.exe"
