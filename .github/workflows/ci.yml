@@ -38,6 +38,12 @@ jobs:
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
+      
+      - name: Cache Nuitka
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuitka_cache
+          key: ${{ runner.os }}-nuitka
 
       - name: Install poetry
         run: pipx install poetry==1.2.0rc2
@@ -67,8 +73,8 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: |
-          echo $PWD/.ccache
-          export NUITKA_CACHE_DIR=$PWD/.ccache
+          export NUITKA_CACHE_DIR=$PWD/.nuitka_cache
+          export CCACHE_DIR=$PWD/.ccache
           poetry run python -m nuitka \
             --standalone \
             --follow-imports \
@@ -85,7 +91,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: cicdtools_${{ matrix.name }}
-          path: ${{ github.workspace }}/cli.dist
+          path: |
+            ${{ github.workspace }}/cli.dist
 
   release:
     needs: build
@@ -107,4 +114,5 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: "cicdtools_*.zip"
+          files: |
+            "cicdtools_*.zip"
