@@ -22,12 +22,15 @@ jobs:
           - os: ubuntu-20.04
             name: Linux
             nuitkaArgs: ""
+            exeExtension: ""
           - os: macos-11
             name: macOS
             nuitkaArgs: ""
+            exeExtension: ""
           - os: windows-2019
             name: Windows
             nuitkaArgs: "--mingw64"
+            exeExtension: ".exe"
 
     steps:
       - uses: actions/checkout@v3
@@ -86,13 +89,25 @@ jobs:
             --show-modules \
             ${{ matrix.nuitkaArgs }} \
             modapp_cicdtools/cli.py
+          
+          mv cli.dist/cli${{ matrix.exeExtension }} cli.dist/cicdtools${{ matrix.exeExtension }}
+          mv cli.dist cicdcdtools
+        shell: bash
+      
+      - name: TestRun
+        if: ${{ !cancelled() }}
+        run: |
+          wget https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.3/cicdtools_${{ matrix.name }}.zip
+          unzip cicdtools_${{ matrix.name }}.zip
+          ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
 
       - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
         with:
           name: cicdtools_${{ matrix.name }}
           path: |
-            ${{ github.workspace }}/cli.dist
+            ${{ github.workspace }}/cicdcdtools
 
   release:
     needs: build
@@ -105,10 +120,10 @@ jobs:
 
       - name: Archive
         run: |
-          chmod +x ./cicdtools_Linux/cli
-          ./cicdtools_Linux/cli archive $PWD/cicdtools_Linux cicdtools_Linux.zip
-          ./cicdtools_Linux/cli archive $PWD/cicdtools_macOS cicdtools_macOS.zip
-          ./cicdtools_Linux/cli archive $PWD/cicdtools_Windows cicdtools_Windows.zip
+          chmod +x ./cicdtools_Linux/cicdtools
+          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_Linux cicdtools_Linux.zip
+          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_macOS cicdtools_macOS.zip
+          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_Windows cicdtools_Windows.zip
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
