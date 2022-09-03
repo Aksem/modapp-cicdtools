@@ -91,7 +91,7 @@ jobs:
             modapp_cicdtools/cli.py
           
           mv cli.dist/cli${{ matrix.exeExtension }} cli.dist/cicdtools${{ matrix.exeExtension }}
-          mv cli.dist cicdcdtools
+          mv cli.dist cicdtools
         shell: bash
       
       - name: TestRun
@@ -107,7 +107,7 @@ jobs:
         with:
           name: cicdtools_${{ matrix.name }}
           path: |
-            ${{ github.workspace }}/cicdcdtools
+            ${{ github.workspace }}/cicdtools
 
   release:
     needs: build
