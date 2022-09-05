@@ -61,6 +61,19 @@ jobs:
         run: |
           poetry install --verbose
         shell: bash
+      
+      # use action instead of wget or curl to support Windows with the same action
+      - uses: suisei-cn/actions-download-file@v1.0.1
+        name: Download cicdtools
+        with:
+          url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.3/cicdtools_${{ matrix.name }}.zip"
+          target: ${{ github.workspace }}
+      
+      - name: Install cicdtools
+        run: |
+          unzip cicdtools_${{ matrix.name }}.zip
+          chmod +x cicdtools_${{ matrix.name }}/cli${{ matrix.exeExtension }}
+        shell: bash
 
       - name: Lint
         run: |
@@ -97,8 +110,6 @@ jobs:
       - name: TestRun
         if: ${{ !cancelled() }}
         run: |
-          wget https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.3/cicdtools_${{ matrix.name }}.zip
-          unzip cicdtools_${{ matrix.name }}.zip
           ./cicdtools_${{ matrix.name }}/cli${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
 
