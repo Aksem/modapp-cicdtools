@@ -10,7 +10,25 @@ Set of tools for simplifying CI/CD configuration for cross-platform builds.
 
 ## Installation
 
-... will be explained after the first releases when the first binaries will be available for download.
+If you use bash, you can use wget to get cicdtools binaries. Replace 'v0.1.3' with version you need and 'Linux' with OS you need cicdtools for.
+
+```bash
+wget https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.3/cicdtools_Linux.zip -O cicdtools.zip
+unzip cicdtools.zip
+```
+
+Then you need either to add cicdtools to PATH, or you can use it as local executable:
+
+```bash
+# Add to PATH and then use as system tool
+export PATH="$PATH:$PWD/cicdtools"
+cicdtools --help
+
+# or use as local executable
+./cicdtools/cicdtools --help
+```
+
+Full example of usage cicdtools for CI/CD configuration of cross-platform build: [example](https://github.com/Aksem/modapp-cicdtools/blob/main/.github/workflows/ci.yml)
 
 ## Commands & Usage
 
