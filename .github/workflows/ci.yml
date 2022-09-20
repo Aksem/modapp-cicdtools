@@ -70,13 +70,13 @@ jobs:
       - uses: suisei-cn/actions-download-file@v1.0.1
         name: Download cicdtools
         with:
-          url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.3/cicdtools_${{ matrix.name }}.zip"
+          url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.8/cicdtools_${{ matrix.name }}.zip"
           target: ${{ github.workspace }}
       
       - name: Install cicdtools
         run: |
           unzip cicdtools_${{ matrix.name }}.zip
-          chmod +x cicdtools_${{ matrix.name }}/cli${{ matrix.exeExtension }}
+          chmod +x cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }}
         shell: bash
 
       - name: Lint
@@ -114,9 +114,9 @@ jobs:
         shell: bash
       
       - name: TestRun
-        if: ${{ !cancelled() && matrix.name != 'macOS' }}
+        if: ${{ !cancelled() }}
         run: |
-          ./cicdtools_${{ matrix.name }}/cli${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
+          ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
 
       - uses: actions/upload-artifact@v3
