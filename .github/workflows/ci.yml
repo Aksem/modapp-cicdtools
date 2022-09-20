@@ -70,7 +70,7 @@ jobs:
       - uses: suisei-cn/actions-download-file@v1.0.1
         name: Download cicdtools
         with:
-          url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.6/cicdtools_${{ matrix.name }}.zip"
+          url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.8/cicdtools_${{ matrix.name }}.zip"
           target: ${{ github.workspace }}
       
       - name: Install cicdtools
