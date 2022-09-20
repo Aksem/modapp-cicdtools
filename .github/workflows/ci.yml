@@ -9,6 +9,10 @@ defaults:
   run:
     shell: bash
 
+env:
+  PACKAGE_NAME: modapp_cicdtools
+  MAIN_MODULE: cli
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -77,7 +81,7 @@ jobs:
 
       - name: Lint
         run: |
-          bash ./lint.sh modapp_cicdtools
+          bash ./lint.sh ${{ env.PACKAGE_NAME }}
         shell: bash
 
       - name: Run unit tests
@@ -101,14 +105,16 @@ jobs:
             --show-memory \
             --show-modules \
             ${{ matrix.nuitkaArgs }} \
-            modapp_cicdtools/cli.py
+            ${{ env.PACKAGE_NAME }}/${{ env.MAIN_MODULE }}.py
           
-          mv cli.dist/cli${{ matrix.exeExtension }} cli.dist/cicdtools${{ matrix.exeExtension }}
-          mv cli.dist cicdtools
+          # rename executable
+          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/cicdtools${{ matrix.exeExtension }}
+          # rename result dir
+          mv ${{ env.MAIN_MODULE }}.dist cicdtools
         shell: bash
       
       - name: TestRun
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.name != 'macOS' }}
         run: |
           ./cicdtools_${{ matrix.name }}/cli${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
@@ -136,9 +142,11 @@ jobs:
           ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_macOS cicdtools_macOS.zip
           ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_Windows cicdtools_Windows.zip
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: "marvinpinto/action-automatic-releases@1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
-            "cicdtools_*.zip"
+            "cicdtools_Linux.zip"
+            "cicdtools_macOS.zip"
+            "cicdtools_Windows.zip"

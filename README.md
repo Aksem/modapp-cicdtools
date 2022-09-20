@@ -76,6 +76,8 @@ Full example of usage cicdtools for CI/CD configuration of cross-platform build:
 
   Check whether the command(e.g., application) starts without errors. If the command doesn't fail in 'timeout' seconds(10 by default), its execution is interpreted as successful.
 
+  **Note:** on Windows the command is executed in `cmd` even if test run is started from `bash`. Either pass cmd command as argument or call `bash` in it explicitly.
+
   Signature:
 
   ```bash
