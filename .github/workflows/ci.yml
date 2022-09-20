@@ -146,7 +146,4 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: |
-            "cicdtools_Linux.zip"
-            "cicdtools_macOS.zip"
-            "cicdtools_Windows.zip"
+          files: "cicdtools_*.zip"
