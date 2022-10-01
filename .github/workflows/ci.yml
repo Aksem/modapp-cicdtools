@@ -184,7 +184,7 @@ jobs:
         if: ${{ !cancelled() && matrix.name == 'Linux' }}
         run: |
           ls .
-          ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "${{ env.APP_NAME }}.AppImage --help"
+          ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "./${{ env.APP_NAME }}.AppImage --help"
         shell: bash
 
       - uses: actions/upload-artifact@v3

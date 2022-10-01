@@ -29,6 +29,8 @@ def replace_load_path():
 
     with open(src_file_path, "w") as src_file:
         src_file.write(src)
+    
+    print(src)
 
 
 if __name__ == "__main__":
