@@ -1,6 +1,6 @@
 #/bin/sh
 
-apk add bash
+apk add bash libffi-dev
 
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
