@@ -147,11 +147,10 @@ jobs:
           echo "Predeploy"
           sudo chown -R $USER ${{ env.MAIN_MODULE }}.dist
 
-          #     # rename executable
+          # rename executable
           mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}
 
           ./buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }} predeploy --app-dir-name="usr" "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}_AppImage"
-          tree "${{ env.APP_NAME }}_AppImage"
 
           # prepare appimagetool
           # custom version of go-appimage is used, gconv is disabed, it's not needed in CLI apps
@@ -164,7 +163,7 @@ jobs:
           docker run \
             --rm \
             -v $(pwd):/app \
-            aksem/modapp-linux-py-cli sh /app/scripts/create_appimage.sh ${{ env.APP_NAME }}
+            aksem/modapp-linux-py-cli sh /app/scripts/create_appimage.sh ${{ env.APP_NAME }} "main"
 
           mv *.AppImage ${{ env.APP_NAME }}.AppImage
 
