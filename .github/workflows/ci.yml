@@ -165,6 +165,8 @@ jobs:
             -v $(pwd):/app \
             aksem/modapp-linux-py-cli sh /app/scripts/create_appimage.sh ${{ env.APP_NAME }} "main"
 
+          echo "--------------"
+          tree .
           mv *.AppImage ${{ env.APP_NAME }}.AppImage
 
       # - name: TestRun
