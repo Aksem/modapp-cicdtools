@@ -146,6 +146,10 @@ jobs:
 
           echo "Predeploy"
           sudo chown -R $USER ${{ env.MAIN_MODULE }}.dist
+
+          #     # rename executable
+          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}
+
           ./buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }} predeploy --app-dir-name="usr" "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}_AppImage"
           tree "${{ env.APP_NAME }}_AppImage"
 
