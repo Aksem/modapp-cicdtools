@@ -126,21 +126,25 @@ jobs:
       - name: BuildAppImage
         if: ${{ matrix.name == 'Linux' }}
         run: |
+          echo "Create venv"
           docker run \
             --rm \
             -v $(pwd):/app \
             aksem/modapp-linux-py-cli sh /app/scripts/create_venv.sh
 
+          echo "Change load path"
           docker run \
             --rm \
             -v $(pwd):/app \
             aksem/modapp-linux-py-cli sh /app/scripts/change_load_path.sh
 
+          echo "Compile"
           docker run \
             --rm \
             -v $(pwd):/app \
             aksem/modapp-linux-py-cli sh /app/scripts/compile.sh
 
+          echo "Predeploy"
           sudo chown -R $USER ${{ env.MAIN_MODULE }}.dist
           ./buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }} predeploy --app-dir-name="usr" "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}_AppImage"
 
@@ -151,6 +155,7 @@ jobs:
           ./appimagetool-custom-x86_64.AppImage --appimage-extract
           cd ..
 
+          echo "Create AppImage"
           docker run \
             --rm \
             -v $(pwd):/app \

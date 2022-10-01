@@ -7,6 +7,8 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 poetry config virtualenvs.in-project true
 
+cd /app/
+
 poetry run python -m nuitka \
             --standalone \
             --follow-imports \
