@@ -29,4 +29,4 @@ END
 # keep original copy
 cp $SOURCE_FILE /app/
 
-sed -i "s/$STRING_TO_REPLACE/$NEW_STRING/gi" $NUITKA_PATH/build/static_src/MetaPathBasedLoader.c
+sed -i "s|$STRING_TO_REPLACE|$NEW_STRING|gi" $NUITKA_PATH/build/static_src/MetaPathBasedLoader.c
