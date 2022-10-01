@@ -10,5 +10,3 @@ cd /app/
 
 appimagetool -s deploy ./$1_AppImage/usr/share/applications/$1.desktop
 appimagetool ./$1_AppImage/
-
-ls .
