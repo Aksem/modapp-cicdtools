@@ -159,7 +159,7 @@ jobs:
           docker run \
             --rm \
             -v $(pwd):/app \
-            aksem/modapp-linux-py-cli sh "/app/scripts/create_appimage.sh ${{ env.APP_NAME }}"
+            aksem/modapp-linux-py-cli sh /app/scripts/create_appimage.sh ${{ env.APP_NAME }}
 
           mv *.AppImage ${{ env.APP_NAME }}.AppImage
 
