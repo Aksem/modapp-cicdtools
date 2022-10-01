@@ -147,6 +147,7 @@ jobs:
           echo "Predeploy"
           sudo chown -R $USER ${{ env.MAIN_MODULE }}.dist
           ./buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }} predeploy --app-dir-name="usr" "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}_AppImage"
+          tree "${{ env.APP_NAME }}_AppImage"
 
           # prepare appimagetool
           # custom version of go-appimage is used, gconv is disabed, it's not needed in CLI apps
