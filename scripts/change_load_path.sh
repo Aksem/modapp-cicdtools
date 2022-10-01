@@ -5,6 +5,8 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 poetry config virtualenvs.in-project true
 
+cd /app/
+
 NUITKA_PATH=$(poetry run python -c "import nuitka; import os; print(os.path.dirname(nuitka.__file__))")
 SOURCE_FILE="$NUITKA_PATH/build/static_src/MetaPathBasedLoader.c"
 
