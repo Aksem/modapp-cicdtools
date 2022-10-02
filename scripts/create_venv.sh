@@ -1,8 +1,8 @@
 #!/bin/sh
 
-PYTHON_BUILD_DEPS="build-base libffi-dev openssl-dev bzip2-dev zlib-dev readline-dev sqlite-dev xz-dev"
+# PYTHON_BUILD_DEPS="openssl-dev bzip2-dev zlib-dev readline-dev sqlite-dev xz-dev"
 
-apk add bash $PYTHON_BUILD_DEPS
+# apk add $PYTHON_BUILD_DEPS
 
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
