@@ -25,12 +25,10 @@ def replace_load_path():
     with open(src_file_path, "r") as src_file:
         src = src_file.read()
 
-    src.replace(STRING_TO_REPLACE, NEW_STRING)
+    src = src.replace(STRING_TO_REPLACE, NEW_STRING)
 
     with open(src_file_path, "w") as src_file:
         src_file.write(src)
-    
-    print(src)
 
 
 if __name__ == "__main__":
