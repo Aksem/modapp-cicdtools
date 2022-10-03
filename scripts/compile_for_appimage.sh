@@ -10,7 +10,7 @@ echo "Create venv"
 sh $LINUX_APPIMAGE_PATH/create_venv.sh
 
 echo "Change load path"
-sh $LINUX_APPIMAGE_PATH/change_load_path.sh
+poetry run python $LINUX_APPIMAGE_PATH/replace_load_path.py
 
 poetry run python -m nuitka \
             --standalone \
