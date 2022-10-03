@@ -12,6 +12,7 @@ defaults:
 env:
   PACKAGE_NAME: modapp_cicdtools
   MAIN_MODULE: cli
+  APP_NAME: cicdtools
 
 jobs:
   build:
@@ -73,10 +74,19 @@ jobs:
           url: "https://github.com/Aksem/modapp-cicdtools/releases/download/v0.1.8/cicdtools_${{ matrix.name }}.zip"
           target: ${{ github.workspace }}
       
-      - name: Install cicdtools
+      - uses: suisei-cn/actions-download-file@v1.0.1
+        name: Download buildtools
+        with:
+          url: "https://github.com/Aksem/modapp-buildtools/releases/download/v0.1.2/buildtools_${{ matrix.name }}.zip"
+          target: ${{ github.workspace }}
+      
+      - name: Install help tools
         run: |
           unzip cicdtools_${{ matrix.name }}.zip
           chmod +x cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }}
+
+          unzip buildtools_${{ matrix.name }}.zip
+          chmod +x buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }}
         shell: bash
 
       - name: Lint
@@ -108,11 +118,43 @@ jobs:
             ${{ env.PACKAGE_NAME }}/${{ env.MAIN_MODULE }}.py
           
           # rename executable
-          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/cicdtools${{ matrix.exeExtension }}
+          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}
           # rename result dir
-          mv ${{ env.MAIN_MODULE }}.dist cicdtools
+          mv ${{ env.MAIN_MODULE }}.dist ${{ env.APP_NAME }}
         shell: bash
-      
+
+      - name: BuildAppImage
+        if: ${{ matrix.name == 'Linux' }}
+        run: |
+          echo "Compile"
+          docker run \
+            --rm \
+            -v $(pwd):/app \
+            aksem/modapp-linux-py-cli sh /app/scripts/compile_for_appimage.sh
+
+          echo "Predeploy"
+          sudo chown -R $USER ${{ env.MAIN_MODULE }}.dist
+
+          # rename executable
+          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}
+
+          ./buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }} predeploy --app-dir-name="usr" "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}_AppImage"
+
+          # prepare appimagetool
+          # custom version of go-appimage is used, gconv is disabed, it's not needed in CLI apps
+          cd scripts
+          chmod +x ../buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage
+          ../buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage --appimage-extract
+          cd ..
+
+          echo "Create AppImage"
+          docker run \
+            --rm \
+            -v $(pwd):/app \
+            aksem/modapp-linux-py-cli sh /app/buildtools_Linux/modapp_buildtools/resources/linux_appimage/create_appimage.sh ${{ env.APP_NAME }} "main"
+
+          mv *.AppImage ${{ env.APP_NAME }}.AppImage
+
       - name: TestRun
         if: ${{ !cancelled() }}
         run: |
@@ -122,9 +164,23 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: ${{ !cancelled() }}
         with:
-          name: cicdtools_${{ matrix.name }}
+          name: ${{ env.APP_NAME }}_${{ matrix.name }}
           path: |
-            ${{ github.workspace }}/cicdtools
+            ${{ github.workspace }}/${{ env.APP_NAME }}
+
+      - name: TestRun_AppImage
+        if: ${{ !cancelled() && matrix.name == 'Linux' }}
+        run: |
+          ls .
+          ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "./${{ env.APP_NAME }}.AppImage --help"
+        shell: bash
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() && matrix.name == 'Linux' }}
+        with:
+          name: ${{ env.APP_NAME }}_${{ matrix.name }}_AppImage
+          path: |
+            ${{ env.APP_NAME }}.AppImage
 
   release:
     needs: build
@@ -138,12 +194,14 @@ jobs:
       - name: Archive
         run: |
           chmod +x ./cicdtools_Linux/cicdtools
-          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_Linux cicdtools_Linux.zip
-          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_macOS cicdtools_macOS.zip
-          ./cicdtools_Linux/cicdtools archive $PWD/cicdtools_Windows cicdtools_Windows.zip
+          ./cicdtools_Linux/cicdtools archive $PWD/${{ env.APP_NAME }}_Linux ${{ env.APP_NAME }}_Linux.zip
+          ./cicdtools_Linux/cicdtools archive $PWD/${{ env.APP_NAME }}_macOS ${{ env.APP_NAME }}_macOS.zip
+          ./cicdtools_Linux/cicdtools archive $PWD/${{ env.APP_NAME }}_Windows ${{ env.APP_NAME }}_Windows.zip
 
       - uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: "cicdtools_*.zip"
+          files: |
+            "${{ env.APP_NAME }}_*.zip"
+            ${{ env.APP_NAME }}_AppImage/${{ env.APP_NAME }}.AppImage
