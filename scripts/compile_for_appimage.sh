@@ -1,11 +1,16 @@
-#/bin/sh
+#!/bin/sh
 
-# export PYENV_ROOT="$HOME/.pyenv"
-# eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
 poetry config virtualenvs.in-project true
 
 cd /app/
+
+LINUX_APPIMAGE_PATH=./buildtools_Linux/modapp_buildtools/resources/linux_appimage
+
+echo "Create venv"
+sh $LINUX_APPIMAGE_PATH/create_venv.sh
+
+echo "Change load path"
+sh $LINUX_APPIMAGE_PATH/change_load_path.sh
 
 poetry run python -m nuitka \
             --standalone \
