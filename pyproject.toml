@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "modapp-cicdtools"
-version = "0.1.9"
+version = "0.1.10"
 description = "Tools for simplyfing CICD configuration to build cross-platform applications"
 authors = ["Vladyslav Hnatiuk <vhnatiuk@ukr.net>"]
 license = "MIT"
