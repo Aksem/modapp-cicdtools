@@ -202,4 +202,6 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: "${{ env.APP_NAME }}_*.zip"
+          files: |
+            "${{ env.APP_NAME }}_*.zip"
+            ${{ env.APP_NAME }}_AppImage/${{ env.APP_NAME }}.AppImage
