@@ -143,9 +143,9 @@ jobs:
           # prepare appimagetool
           # custom version of go-appimage is used, gconv is disabed, it's not needed in CLI apps
           cd scripts
-          chmod +x /app/buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage
-          /app/buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage --appimage-extract
-          cp -R /app/buildtools_Linux/modapp_buildtools/resources/linux_appimage/squashfs-root ./
+          chmod +x ../buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage
+          ../buildtools_Linux/modapp_buildtools/resources/linux_appimage/appimagetool-custom-x86_64.AppImage --appimage-extract
+          cp -R ../buildtools_Linux/modapp_buildtools/resources/linux_appimage/squashfs-root ./
           cd ..
 
           echo "Create AppImage"
