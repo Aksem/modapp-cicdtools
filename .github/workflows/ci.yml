@@ -118,10 +118,18 @@ jobs:
             ${{ env.PACKAGE_NAME }}/${{ env.MAIN_MODULE }}.py
           
           # rename executable
-          mv ${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }} ${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}
+          mv "${{ env.MAIN_MODULE }}.dist/${{ env.MAIN_MODULE }}${{ matrix.exeExtension }}" "${{ env.MAIN_MODULE }}.dist/${{ env.APP_NAME }}${{ matrix.exeExtension }}"
           # rename result dir
-          mv ${{ env.MAIN_MODULE }}.dist ${{ env.APP_NAME }}
+          mv "${{ env.MAIN_MODULE }}.dist" "${{ env.APP_NAME }}"
         shell: bash
+
+      - name: FixMacOSLinking
+        if: ${{ matrix.name == 'macOS' }}
+        run: |
+          # temporary linking fix on macOS
+          PYTHON_LIB_PATH=$(python -c "from distutils import sysconfig;print(sysconfig.get_config_var(\"LIBDIR\"))")
+          install_name_tool -change "$PYTHON_LIB_PATH/libpython3.10.dylib" "@rpath/libpython3.10.dylib" "${{ env.APP_NAME }}/${{ env.APP_NAME }}${{ matrix.exeExtension }}"
+          install_name_tool -add_rpath "@executable_path" "${{ env.APP_NAME }}/${{ env.APP_NAME }}${{ matrix.exeExtension }}"
 
       - name: BuildAppImage
         if: ${{ matrix.name == 'Linux' }}
@@ -156,7 +164,7 @@ jobs:
           mv *.AppImage ${{ env.APP_NAME }}.AppImage
 
       - name: TestRun
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.name != 'macOS' }}
         run: |
           ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
@@ -171,7 +179,6 @@ jobs:
       - name: TestRun_AppImage
         if: ${{ !cancelled() && matrix.name == 'Linux' }}
         run: |
-          ls .
           ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "./${{ env.APP_NAME }}.AppImage --help"
         shell: bash
 
