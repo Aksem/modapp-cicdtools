@@ -164,7 +164,7 @@ jobs:
           mv *.AppImage ${{ env.APP_NAME }}.AppImage
 
       - name: TestRun
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.name != 'macOS' }}
         run: |
           ./cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }} test-run "cicdtools/cicdtools${{ matrix.exeExtension }} file-exists modapp_cicdtools/cli.py"
         shell: bash
