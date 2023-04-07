@@ -584,7 +584,6 @@ files = [
 ]
 
 [package.dependencies]
-orderedset = ">=2.0.3"
 subprocess32 = "*"
 
 [[package]]
@@ -601,17 +600,6 @@ files = [
 
 [package.extras]
 dev = ["black", "mypy", "pytest"]
-
-[[package]]
-name = "orderedset"
-version = "2.0.3"
-description = "An Ordered Set implementation in Cython."
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "orderedset-2.0.3.tar.gz", hash = "sha256:b2f5ccfb5a86e7b3b3ddf18b29779cc18b24653abf9d6da4bebecf33780a6e29"},
-]
 
 [[package]]
 name = "packaging"
