@@ -27,11 +27,11 @@ jobs:
           - os: ubuntu-20.04
             name: Linux
             nuitkaArgs: ""
-            exeExtension: ""
-          - os: macos-11
+            exeExtension: ".bin"
+          - os: macos-12
             name: macOS
-            nuitkaArgs: ""
-            exeExtension: ""
+            nuitkaArgs: "--macos-target-arch=universal"
+            exeExtension: ".bin"
           - os: windows-2019
             name: Windows
             nuitkaArgs: "--mingw64"
@@ -54,7 +54,7 @@ jobs:
           key: ${{ runner.os }}-nuitka
 
       - name: Install poetry
-        run: pipx install poetry==1.2.0rc2
+        run: pipx install poetry==1.4.2
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -99,6 +99,54 @@ jobs:
         run: |
           poetry run python -m pytest tests/
         shell: bash
+
+      - name: InstallUniversalPythonMacOS
+        if: ${{ matrix.name == 'macOS' }}
+        run: |
+          set -eu
+
+          # install pyenv
+          curl https://pyenv.run | bash
+          export PYENV_ROOT="$HOME/.pyenv"
+          command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+          echo "##vso[task.setvariable variable=PYENV_ROOT]$HOME/.pyenv"
+          echo "##vso[task.setvariable variable=path]$PATH:$PYENV_ROOT/bin/:$PYENV_ROOT/shims"
+          eval "$(pyenv init -)"
+          eval "$(pyenv virtualenv-init -)"
+
+          BREW_ARM_PREFIX="$HOME/opt/brew.universal"
+          BREW_X86_PREFIX="$HOME/opt/brew.x86_64"
+
+          # Create one Homebrew clone for ARM64, and another one for x86-64
+          git clone https://github.com/Homebrew/brew "$BREW_ARM_PREFIX"
+          git clone https://github.com/Homebrew/brew "$BREW_X86_PREFIX"
+
+          # Install dependencies for both architectures
+          PATH="$BREW_ARM_PREFIX/bin:$PATH" arch -arm64  brew install gettext ncurses openssl@1.1 readline tcl-tk xz
+          PATH="$BREW_X86_PREFIX/bin:$PATH" arch -x86_64 brew install gettext ncurses openssl@1.1 readline tcl-tk xz
+
+          # Merge all binaries from both architectures into fat executables
+          cd "$BREW_ARM_PREFIX"
+          find ./Cellar -type f \( -name "*.a" -or -name "*.dylib" -or -perm +111 \) | while read -r f; do
+              if file "$f" | grep -q "Mach-O"; then
+                  if [ -f "$BREW_X86_PREFIX/$f" ]; then
+                      lipo "$f" "$BREW_X86_PREFIX/$f" -create -output "${f}.universal"
+                      mv "${f}.universal" "$f"
+                      echo "MERGED: $f"
+                  else
+                      echo "WARNING: x86-64 binary not found: $f"
+                  fi
+              fi
+          done
+
+          BREW_UNIVERSAL_PREFIX="$HOME/opt/brew.universal"
+          export PATH="$BREW_UNIVERSAL_PREFIX/bin:$PATH"
+          export LDFLAGS="-L$BREW_UNIVERSAL_PREFIX/opt/gettext/lib     -L$BREW_UNIVERSAL_PREFIX/opt/ncurses/lib     -L$BREW_UNIVERSAL_PREFIX/opt/openssl@1.1/lib     -L$BREW_UNIVERSAL_PREFIX/opt/readline/lib     -L$BREW_UNIVERSAL_PREFIX/opt/tcl-tk/lib     -L$BREW_UNIVERSAL_PREFIX/opt/xz/lib"
+          export CFLAGS=" -I$BREW_UNIVERSAL_PREFIX/opt/gettext/include -I$BREW_UNIVERSAL_PREFIX/opt/ncurses/include -I$BREW_UNIVERSAL_PREFIX/opt/openssl@1.1/include -I$BREW_UNIVERSAL_PREFIX/opt/readline/include -I$BREW_UNIVERSAL_PREFIX/opt/tcl-tk/include -I$BREW_UNIVERSAL_PREFIX/opt/xz/include"
+          export CPPFLAGS="$CFLAGS"
+          export CXXFLAGS="$CFLAGS"
+          export PKG_CONFIG_PATH="$BREW_UNIVERSAL_PREFIX/opt/ncurses/lib/pkgconfig:$BREW_UNIVERSAL_PREFIX/opt/openssl@1.1/lib/pkgconfig:$BREW_UNIVERSAL_PREFIX/opt/readline/lib/pkgconfig:$BREW_UNIVERSAL_PREFIX/opt/tcl-tk/lib/pkgconfig:$BREW_UNIVERSAL_PREFIX/opt/xz/lib/pkgconfig"
+          PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=universal2" pyenv install --verbose 3.10.10
 
       - name: Build
         if: ${{ !cancelled() }}
