@@ -83,10 +83,12 @@ jobs:
       - name: Install help tools
         run: |
           unzip cicdtools_${{ matrix.name }}.zip
-          chmod +x cicdtools_${{ matrix.name }}/cicdtools${{ matrix.exeExtension }}
+          # ${{ matrix.exeExtension }}
+          chmod +x cicdtools_${{ matrix.name }}/cicdtools
 
           unzip buildtools_${{ matrix.name }}.zip
-          chmod +x buildtools_${{ matrix.name }}/buildtools${{ matrix.exeExtension }}
+          # ${{ matrix.exeExtension }}
+          chmod +x buildtools_${{ matrix.name }}/buildtools
         shell: bash
 
       - name: Lint
